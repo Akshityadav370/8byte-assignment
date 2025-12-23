@@ -52,7 +52,6 @@ export function readHoldingsFromExcel() {
       )
         return row;
     });
-    console.log('data', data);
     return data;
   } catch (error) {
     console.error('error when reading holdings', error);
