@@ -7,7 +7,6 @@ export async function getCMP(symbols) {
   const uncached = [];
 
   for (const symbol of symbols) {
-    console.log('symbol', symbol);
     const cached = await redisClient.get(`cmp:${symbol}`);
     if (cached) {
       results[symbol] = Number(cached);

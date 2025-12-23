@@ -5,7 +5,6 @@ const FILE_PATH = path.join(process.cwd(), 'sample.xlsx');
 
 export function readHoldingsFromExcel() {
   try {
-    console.log('file path', FILE_PATH);
     const workbook = xlsx.readFile(FILE_PATH);
     // console.log('workbook', workbook);
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
