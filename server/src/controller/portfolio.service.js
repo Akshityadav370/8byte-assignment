@@ -21,7 +21,7 @@ export async function buildPortfolio() {
   const symbols = dataWithSymbols.map((h) => h.symbol);
 
   const cmpMap = await getCMP(symbols);
-  console.log('cmpMap', cmpMap);
+  //   console.log('cmpMap', cmpMap);
 
   const fundamentalsMap = {};
   const symbolsNeedingScraping = [];
