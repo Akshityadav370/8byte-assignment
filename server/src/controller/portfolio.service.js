@@ -1,7 +1,10 @@
 import { readHoldingsFromExcel } from '../utils/excel.utils.js';
 import { getHomogenousSymbol } from '../utils/mapping.utils.js';
-import { getFundamentals } from './google.service.js';
-import { getCMP } from './yahoo.service.js';
+import {
+  getPEnEarningFromGoogle,
+  startBackgroundScraping,
+} from './google.service.js';
+import { getCMP, getPEnEarningFromYahoo } from './yahoo.service.js';
 
 let holdingsCache = null;
 
@@ -10,29 +13,58 @@ export async function buildPortfolio() {
     holdingsCache = readHoldingsFromExcel();
   }
 
-  // add homogenous exchange
   const dataWithSymbols = holdingsCache.map((holding) => {
     const symbol = getHomogenousSymbol(holding.exchange);
     return { ...holding, symbol };
   });
 
-  const cmpMap = await getCMP(dataWithSymbols.map((data) => data.symbol));
+  const symbols = dataWithSymbols.map((h) => h.symbol);
 
-  //   console.log(await getCMP(['SAVFI.NS']));
+  const cmpMap = await getCMP(symbols);
+  console.log('cmpMap', cmpMap);
+
+  const fundamentalsMap = {};
+  const symbolsNeedingScraping = [];
+
+  for (const symbol of symbols) {
+    let googleSymbol = symbol.replace('.NS', ':NSE');
+    const googleData = await getPEnEarningFromGoogle(googleSymbol);
+    // const googleData = null;
+
+    if (googleData) {
+      // found in google cache
+      fundamentalsMap[symbol] = googleData;
+    } else {
+      // not in google cache, will fetch from yahoo
+      symbolsNeedingScraping.push(googleSymbol);
+    }
+  }
+
+  if (symbolsNeedingScraping.length > 0) {
+    console.log(
+      `using yahoo fallback for ${JSON.stringify(symbolsNeedingScraping)}`
+    );
+    const symbolsNeedingScrapingYahoo = symbolsNeedingScraping.map((item) =>
+      item.split(':NSE').join('.NS')
+    );
+    const yahooFundamentals = await getPEnEarningFromYahoo(
+      symbolsNeedingScrapingYahoo
+    );
+    // console.log('yahooFundamentals', yahooFundamentals);
+    Object.assign(fundamentalsMap, yahooFundamentals);
+
+    startBackgroundScraping(symbolsNeedingScraping);
+  }
 
   const resData = [];
-
   let totalInvestment = 0;
   let totalPresentValue = 0;
-  //   console.log(cmpMap);
+  //   console.log('Fundamentals map:', fundamentalsMap);
 
   for (const h of dataWithSymbols) {
     const cmp = cmpMap[h.symbol];
-    // replace BAJAJHFL.NS with BAJAJHFL:NSE
-    // const data = await getFundamentals('BAJAJHFL:NSE');
-    // const fundamentals = await getFundamentals(h.symbol);
-    // console.log('cmp', cmp, h.symbol);
-    if (!cmp) continue;
+    const fundamentals = fundamentalsMap[h.symbol] || {};
+    // if (!cmp) continue;
 
     const investment = h.purchasePrice * h.quantity;
     const presentValue = cmp * h.quantity;
@@ -47,7 +79,9 @@ export async function buildPortfolio() {
       investment,
       presentValue,
       gainLoss,
-      //   ...fundamentals,
+      peRatio: fundamentals.peRatio,
+      latestEarnings: fundamentals.latestEarnings,
+      source: fundamentals.source,
     });
   }
 
