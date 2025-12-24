@@ -53,7 +53,7 @@ export async function buildPortfolio() {
     // console.log('yahooFundamentals', yahooFundamentals);
     Object.assign(fundamentalsMap, yahooFundamentals);
 
-    startBackgroundScraping(symbolsNeedingScraping);
+    // startBackgroundScraping(symbolsNeedingScraping);
   }
 
   const resData = [];

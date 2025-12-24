@@ -7,7 +7,7 @@ export const yahooFinance = new YahooFinance({
 
 export const portfolioLimiter = rateLimit({
   windowMs: 15 * 1000,
-  max: 2,
+  max: 50,
   message: {
     success: false,
     error:
@@ -15,5 +15,5 @@ export const portfolioLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  //   skip: (req) => req.ip === '::1',
+  skip: (req) => req.ip === '::1',
 });

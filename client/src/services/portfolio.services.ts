@@ -11,8 +11,11 @@ export const portfolioService = {
       return response.data
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        throw new Error(
-          error.response?.data?.message || 'Failed to fetch portfolio data',
+        throw Object.assign(
+          new Error(
+            error.response?.data?.message || 'Failed to fetch portfolio data',
+          ),
+          { status: error.response?.status },
         )
       }
       throw new Error('An unexpected error occurred')

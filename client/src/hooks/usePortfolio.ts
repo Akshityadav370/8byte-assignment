@@ -26,8 +26,14 @@ export const usePortfolio = (
       setLastUpdated(new Date())
       setError(null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch portfolio')
-      console.error('Error fetching portfolio:', err)
+      const message = 'Failed to fetch portfolio'
+      let status
+      if (err instanceof Error && 'status' in err) {
+        status = (err as any).status
+      }
+
+      //   if (status !== 429) setError(message)
+      console.error('Fetch portfolio failed:', { status, err })
     } finally {
       setLoading(false)
     }
