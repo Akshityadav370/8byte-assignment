@@ -254,7 +254,7 @@ const PortfolioTable: React.FC = () => {
             fill="#8884d8"
             dataKey="value"
           >
-            {pieChartData.map((entry, index) => (
+            {pieChartData.map((_item, index) => (
               <Cell
                 key={`cell-${index}`}
                 fill={COLORS[index % COLORS.length]}
