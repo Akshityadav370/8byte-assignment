@@ -4,6 +4,10 @@ import { portfolioLimiter } from '../configs/common.js';
 
 const router = Router();
 
+router.get('/health', async (req, res) => {
+  res.send('hi');
+});
+
 router.get('/portfolio', portfolioLimiter, async (_req, res) => {
   try {
     const data = await buildPortfolio();
