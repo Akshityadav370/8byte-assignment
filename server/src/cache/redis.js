@@ -9,8 +9,13 @@ redisClient.on('error', (err) => {
 });
 
 export async function connectRedis() {
-  if (!redisClient.isOpen) {
-    await redisClient.connect();
-    console.log('Redis cache connected on port 6379');
+  try {
+    if (!redisClient.isOpen) {
+      await redisClient.connect();
+      console.log('Redis cache connected');
+    }
+  } catch (err) {
+    console.error('Failed to connect Redis', err);
+    process.exit(1);
   }
 }

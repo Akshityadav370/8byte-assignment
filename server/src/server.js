@@ -3,7 +3,7 @@ import { connectRedis } from './cache/redis.js';
 
 async function start() {
   await connectRedis();
-  app.listen(5001, () => console.log('Backend running on port 5001'));
+  app.listen(3002, () => console.log('Backend running on port 3002'));
 }
 
 start();
