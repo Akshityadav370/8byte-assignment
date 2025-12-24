@@ -19,6 +19,8 @@ export interface Sector {
   totalInvestment: number
   totalPresentValue: number
   totalGainLoss: number
+  totalQty: number
+  totalPurchasePrice: number
   stocks: Array<Stock>
 }
 

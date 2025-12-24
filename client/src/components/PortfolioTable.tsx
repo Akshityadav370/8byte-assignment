@@ -29,8 +29,10 @@ interface TableRow {
   presentValue: number
   gainLoss: number
   peRatio?: number | null
+  peRatioWithSource?: string
   latestEarnings?: number | null
   portfolioPercent?: number
+  latestEarningsWithSource?: string
   isSector?: boolean
 }
 
@@ -144,7 +146,7 @@ const PortfolioTable: React.FC = () => {
                   : 'text-red-600 font-semibold'
               }
             >
-              {isPositive ? '+' : ''}₹
+              {isPositive ? '+' : ''}
               {value
                 ? value.toLocaleString('en-IN', { maximumFractionDigits: 2 })
                 : '-'}
@@ -153,19 +155,23 @@ const PortfolioTable: React.FC = () => {
         },
       },
       {
-        accessorKey: 'peRatio',
+        accessorKey: 'peRatioWithSource',
         header: 'P/E Ratio',
         cell: ({ getValue }) => {
-          const value = getValue() as number | null | undefined
-          return value ? value.toFixed(2) : '-'
+          // const value = getValue() as number | null | undefined
+          // return value ? value.toFixed(2) : '-'
+          const value = getValue() as string | undefined
+          return value ? value : ''
         },
       },
       {
-        accessorKey: 'latestEarnings',
+        accessorKey: 'latestEarningsWithSource',
         header: 'Earnings',
         cell: ({ getValue }) => {
-          const value = getValue() as number | null | undefined
-          return value ? value.toFixed(2) : '-'
+          // const value = getValue() as number | null | undefined
+          // return value ? value.toFixed(2) : '-'
+          const value = getValue() as string | undefined
+          return value ? value : ''
         },
       },
     ],
@@ -190,6 +196,8 @@ const PortfolioTable: React.FC = () => {
         presentValue: sector.totalPresentValue,
         gainLoss: sector.totalGainLoss,
         portfolioPercent: parseFloat(sectorPercent),
+        purchasePrice: sector.totalPurchasePrice,
+        quantity: sector.totalQty,
         isSector: true,
       })
 
@@ -200,6 +208,12 @@ const PortfolioTable: React.FC = () => {
             calculatePortfolioPercent(stock.investment, totalInvestment),
           ),
           isSector: false,
+          peRatioWithSource: stock.peRatio
+            ? `${stock.peRatio} (${stock.source})`
+            : '-',
+          latestEarningsWithSource: stock.latestEarnings
+            ? `${stock.latestEarnings} (${stock.source})`
+            : '-',
         })
       })
     })
@@ -307,23 +321,25 @@ const PortfolioTable: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white p-5 rounded-lg border border-gray-200 space-y-3">
+          <div className="bg-white p-5 rounded-lg border border-gray-200 flex justify-around flex-col">
             <div>
-              <div className="text-sm text-gray-500 mb-2">Total Investment</div>
-              <div className="text-2xl font-semibold text-gray-900">
+              <div className="text-xl text-gray-500 mb-2">Total Investment</div>
+              <div className="text-4xl font-semibold text-gray-900">
                 ₹{data?.summary?.totalInvestment?.toLocaleString('en-IN')}
               </div>
             </div>
+            <div className="w-full border-[0.5px] border-gray-300"></div>
             <div>
-              <div className="text-sm text-gray-500 mb-2">Present Value</div>
-              <div className="text-2xl font-semibold text-gray-900">
+              <div className="text-xl text-gray-500 mb-2">Present Value</div>
+              <div className="text-4xl font-semibold text-gray-900">
                 ₹{data?.summary?.totalPresentValue?.toLocaleString('en-IN')}
               </div>
             </div>
+            <div className="w-full border-[0.5px] border-gray-300"></div>
             <div>
-              <div className="text-sm text-gray-500 mb-2">Total Gain/Loss</div>
+              <div className="text-xl text-gray-500 mb-2">Total Gain/Loss</div>
               <div
-                className={`text-2xl font-semibold ${
+                className={`text-4xl font-semibold ${
                   totalGainLoss >= 0 ? 'text-green-500' : 'text-red-500'
                 }`}
               >
@@ -331,7 +347,7 @@ const PortfolioTable: React.FC = () => {
                 {totalGainLoss.toLocaleString('en-IN')}
               </div>
               <div
-                className={`text-sm mt-1 ${
+                className={`text-xl mt-1 ${
                   totalGainLoss >= 0 ? 'text-green-500' : 'text-red-500'
                 }`}
               >

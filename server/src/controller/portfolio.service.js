@@ -53,7 +53,7 @@ export async function buildPortfolio() {
     // console.log('yahooFundamentals', yahooFundamentals);
     Object.assign(fundamentalsMap, yahooFundamentals);
 
-    // startBackgroundScraping(symbolsNeedingScraping);
+    startBackgroundScraping(symbolsNeedingScraping);
   }
 
   const resData = [];
@@ -94,14 +94,20 @@ export async function buildPortfolio() {
         totalInvestment: 0,
         totalPresentValue: 0,
         totalGainLoss: 0,
+        totalQty: 0,
+        totalPurchasePrice: 0,
         stocks: [],
       };
     }
 
     const sector = sectors[stock.sector];
-    sector.totalInvestment += stock.investment;
-    sector.totalPresentValue += stock.presentValue;
-    sector.totalGainLoss += stock.gainLoss;
+    if (stock.investment) sector.totalInvestment += stock.investment;
+    if (stock.presentValue) sector.totalPresentValue += stock.presentValue;
+    if (stock.gainLoss) sector.totalGainLoss += stock.gainLoss;
+
+    sector.totalPurchasePrice += stock.purchasePrice;
+    sector.totalQty += stock.quantity;
+
     sector.stocks.push(stock);
   }
 
