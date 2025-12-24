@@ -206,13 +206,58 @@ const PortfolioTable: React.FC = () => {
     return rows
   }, [data])
 
+  const sectorDataKey = useMemo(() => {
+    if (!data?.sectors) return ''
+    return data.sectors
+      .map((s) => `${s.sectorName}-${s.totalInvestment}`)
+      .join('|')
+  }, [data?.sectors])
+
   const pieChartData = useMemo(() => {
     if (!data?.sectors) return []
     return data.sectors.map((sector) => ({
       name: sector.sectorName,
       value: sector.totalInvestment,
     }))
-  }, [data])
+  }, [sectorDataKey])
+
+  const MemoizedPieChart = useMemo(() => {
+    return (
+      <ResponsiveContainer width="100%" height={300}>
+        <PieChart>
+          <Pie
+            data={pieChartData}
+            cx="50%"
+            cy="50%"
+            labelLine={false}
+            label={({ name, percent }) =>
+              percent !== undefined
+                ? `${name}: ${(percent * 100).toFixed(1)}%`
+                : name
+            }
+            outerRadius={100}
+            fill="#8884d8"
+            dataKey="value"
+          >
+            {pieChartData.map((entry, index) => (
+              <Cell
+                key={`cell-${index}`}
+                fill={COLORS[index % COLORS.length]}
+              />
+            ))}
+          </Pie>
+          <Tooltip
+            formatter={(value?: number) =>
+              typeof value === 'number'
+                ? `₹${value.toLocaleString('en-IN')}`
+                : '-'
+            }
+          />
+          <Legend />
+        </PieChart>
+      </ResponsiveContainer>
+    )
+  }, [pieChartData])
 
   const table = useReactTable({
     data: flattenedData,
@@ -299,40 +344,7 @@ const PortfolioTable: React.FC = () => {
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
               Sector Allocation
             </h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={pieChartData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) =>
-                    percent !== undefined
-                      ? `${name}: ${(percent * 100).toFixed(1)}%`
-                      : name
-                  }
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {pieChartData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip
-                  formatter={(value?: number) =>
-                    typeof value === 'number'
-                      ? `₹${value.toLocaleString('en-IN')}`
-                      : '-'
-                  }
-                />
-
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
+            {MemoizedPieChart}
           </div>
         </div>
 
