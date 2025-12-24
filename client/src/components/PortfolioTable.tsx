@@ -15,6 +15,7 @@ import {
   Tooltip,
 } from 'recharts'
 import { usePortfolio } from '../hooks/usePortfolio'
+import MyInfo from './MyInfo'
 
 import type { ColumnDef } from '@tanstack/react-table'
 
@@ -313,7 +314,10 @@ const PortfolioTable: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-6 w-full">
+        <div className="mb-6 w-full flex items-center justify-between">
+          <div>
+            <MyInfo />
+          </div>
           <div className="flex items-center justify-end gap-4 text-sm text-gray-500">
             <span>Last updated: {lastUpdated?.toLocaleTimeString()}</span>
             <span>Auto-refresh: 15s</span>
